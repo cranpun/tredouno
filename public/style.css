@@ -1,0 +1,36 @@
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.fadein {
+    animation-name: fadein;
+    animation-duration: 500ms;
+    animation-timing-function: ease;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+fieldset {
+    border: none;
+}
+a {
+    cursor: pointer;
+}

@@ -21,6 +21,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Gate::define(\App\L\Role::ID_ADMIN, function($user) {
+            return in_array($user->role, [\App\L\Role::ID_ADMIN]);
+        });
     }
 }
