@@ -10,8 +10,8 @@
 </head>
 
 <body id="body">
-    <header id="header">
-        <nav role="navigation">
+    <header id="header" style="padding-bottom: 0px;">
+        <nav role="navigation" style="margin-bottom: 0px;">
             <?php if(!$user): ?>
             @include('pub.topnav')
             <?php else: ?>
@@ -21,9 +21,9 @@
     </header>
     <main id="main">
         @include('message')
-        <section id="contents-{{ Route::currentRouteName() }}">
+        <div id="contents-{{ Route::currentRouteName() }}">
             @yield('main')
-        <section>
+        <div>
     </main>
 </body>
 

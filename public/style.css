@@ -34,3 +34,8 @@ fieldset {
 a {
     cursor: pointer;
 }
+.simple-form {
+    border: none;
+    box-shadow: none;
+    padding: 0px;
+}

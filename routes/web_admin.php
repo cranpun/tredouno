@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Admin\User\UserController;
-use \App\Http\Controllers\Admin\Page\PageController;
+use \App\Http\Controllers\Admin\Game\GameController;
 
 $role = "admin";
 Route::middleware(["can:{$role}", "auth"])->prefix($role)->group(function () use ($role) {
 
-    Route::get("/", [PageController::class, "home"])->name("{$role}-home");
+    Route::get("/", [GameController::class, "index"])->name("{$role}-home");
 
     // **************************************************************
     // user
@@ -20,4 +20,10 @@ Route::middleware(["can:{$role}", "auth"])->prefix($role)->group(function () use
     // Route::get("/user/update/{user_id}", [UserController::class, "update"])->name("{$role}-user-update");
     // Route::post("/user/updatestore/{user_id}", [UserController::class, "updatestore"])->name("{$role}-user-updatestore");
     // Route::get("/user/index", [UserController::class, "index"])->name("{$role}-user-index");
+
+    // **************************************************************
+    // game
+    // **************************************************************
+    Route::post("/game/createstore", [GameController::class, "createstore"])->name("{$role}-game-createstore");
+    Route::get("/game/play/{game_id}", [GameController::class, "play"])->name("{$role}-game-play");
 });

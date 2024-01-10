@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -13,9 +14,11 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         $passchangeme = '$2y$10$Sbjg0oCnsavSp71.IJvtEuiiFAc9S6vgBpX.3AwanJkzJk88rCG.C';
-
+        $now = now();
         $base = [
             'password' => $passchangeme,
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
 
         \DB::table('user')->insert([

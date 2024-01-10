@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Page;
+namespace App\Http\Controllers\Admin\Game;
 
 use Illuminate\Http\Request;
 
-class PageController extends \App\Http\Controllers\Controller
+class GameController extends \App\Http\Controllers\Controller
 {
     // *********************************************************
     // utils
@@ -13,5 +13,7 @@ class PageController extends \App\Http\Controllers\Controller
     // *********************************************************
     // action
     // *********************************************************
-    use \App\Http\Controllers\Admin\Page\PageTraitHome;
+    use \App\Http\Controllers\Admin\Game\GameTraitIndex;
+    use \App\Http\Controllers\Admin\Game\GameTraitCreatestore;
+    use \App\Http\Controllers\Admin\Game\GameTraitPlay;
 }
