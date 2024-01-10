@@ -13,6 +13,10 @@
 
 @section('main')
 
-<? print_r($game); ?>
+<ul>
+@foreach($game->players as $player)
+<li>{{ $player->display_name }}</li>
+@endforeach
+</ul>
 
 @endsection

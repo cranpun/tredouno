@@ -13,6 +13,8 @@ class Game extends Model
         "id",
     ];
     const CARD_PREFIX = "cd_";
+    
+    public $players;
 
     public static function validaterule(): array
     {
@@ -72,9 +74,32 @@ class Game extends Model
         return $ret;
     }
 
+    public function loadPlayers()
+    {
+        $user_ids = explode(",", $this->order);
+        $players = \App\Models\User::whereIn("user.id", $user_ids)->get();
+        // 並び順を調整
+        $this->players = [];
+        foreach($user_ids as $user_id) {
+            foreach($players as $player) {
+                if($player->id == $user_id) {
+                    $this->players[] = $player;
+                    break;
+                }
+            }
+        }
+    }
+
+    public function addOrder($user_id)
+    {
+        $orders = explode(",", $this->order);
+        if(!in_array($user_id, $orders)) {
+            $orders[] = $user_id;
+            $this->order = join(",", $orders);
+        }
+    }
+
     public function setData(array $data)
     {
-        $this->user_id = \App\U\U::getd($data, "user_id", $this->user_id);
-        $this->game_id = \App\U\U::getd($data, "game_id", $this->game_id);
     }
 }

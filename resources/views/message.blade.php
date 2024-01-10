@@ -3,7 +3,7 @@ $messageError = session('message-error');
 $messageSuccess = session('message-success');
 $hasErrors = $errors && count($errors->all());
 ?>
-@if ($messageError || $messageSuccess || $hasErrors):
+@if ($messageError || $messageSuccess || $hasErrors)
     <section id="message-group">
         <aside>
             @if (session('message-error'))

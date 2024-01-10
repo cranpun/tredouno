@@ -13,6 +13,7 @@ trait GameTraitPlay
         // \Validator::make($data, $val)->validate(); // throw exception
 
         $game = \App\Models\Game::find($game_id);
+        $game->loadPlayers();
 
         return view("admin.game.play.main", compact(["game"]));
     }

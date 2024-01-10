@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Game;
 
-trait GameTraitCreatestore
+trait GameTraitEnterstore
 {
-    public function createstore(\Illuminate\Http\Request $request)
+    public function enterstore(\Illuminate\Http\Request $request, $game_id)
     {
         // 特にポストするデータはなし。
         // $data = $request->all();
@@ -13,19 +13,17 @@ trait GameTraitCreatestore
         // \Validator::make($data, $val)->validate(); // throw exception
 
         try {
-            $row = \DB::transaction(function () {
-                $row = \App\U\U::save(function () {
+            $row = \DB::transaction(function () use ($game_id){
+                $row = \App\U\U::save(function () use ($game_id) {
                     $user = \App\Models\User::user();
-                    $row = new \App\Models\Game();
+                    $row = \App\Models\Game::find($game_id);
                     $row->last_event_at = now();
                     $row->addOrder($user->id);
                     $row->save();
-                    \Log::info(print_r($row, true));
                     return $row;
-                }, "登録に失敗しました。");
+                }, "入室に失敗しました。");
                 return $row;
             });
-            $mes = "登録しました。";
 
             return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $row->id]);
         } catch (\Exception $e) {
