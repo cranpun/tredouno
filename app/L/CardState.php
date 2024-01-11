@@ -16,4 +16,17 @@ class CardState extends ZzzLabel
             self::ID_HEAD => "先頭札",
         ];
     }
+
+    public static function dealCard($cnames, $count)
+    {
+        $ret = [];
+        // 指定されたIDに、指定回数カードを配る
+        for ($i = 0; $i < $count; $i++) {
+            $maxCname = count($cnames) - 1;
+            $deal = random_int(0, $maxCname);
+            $ret[] = $cnames[$deal];
+            unset($cnames[$deal]); // このカードは配ったので対象外
+        }
+        return $ret;
+    }
 }

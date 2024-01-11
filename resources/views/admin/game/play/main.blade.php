@@ -28,15 +28,15 @@
         <h2>プレイヤーと残り枚数</h2>
         <ul>
             @foreach ($game->players as $player)
-                <li>{{ $player->display_name }}</li>
+                <li>{{ $player->display_name }} ({{ count($game->getCardsByStatus($player->id)) }})</li>
             @endforeach
         </ul>
     </div>
     <div>
         <h2>あなたの持ち札</h2>
         <ul>
-            @foreach ($game->players as $player)
-                <li>{{ $player->display_name }}</li>
+            @foreach ($game->getCardsByStatus(\App\Models\User::user()->id) as $card)
+                <li>{{ $card }}</li>
             @endforeach
         </ul>
     </div>

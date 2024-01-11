@@ -6,17 +6,18 @@ trait GameTraitPlaystore
 {
     public function playstore(\Illuminate\Http\Request $request, $game_id)
     {
-        $row = \App\Models\Game::find($game_id);
-        if (!$row->isPlaying()) {
+        $game = \App\Models\Game::find($game_id);
+        if (!$game->isPlaying()) {
             try {
-                $row = \DB::transaction(function () use ($row) {
-                    $row = \App\U\U::save(function () use ($row) {
-                        $row->last_event_at = now();
-                        $row->playing = \App\L\OnOff::ID_ON;;
-                        $row->save();
-                        return $row;
+                $game = \DB::transaction(function () use ($game) {
+                    $game = \App\U\U::save(function () use ($game) {
+                        $game->last_event_at = now();
+                        $game->playing = \App\L\OnOff::ID_ON;
+                        $game = $this->playstore_dealcard($game);
+                        $game->save();
+                        return $game;
                     }, "入室に失敗しました。");
-                    return $row;
+                    return $game;
                 });
             } catch (\Exception $e) {
                 return back()->with("message-error", $e->getMessage())->withInput();
@@ -24,10 +25,33 @@ trait GameTraitPlaystore
         }
 
         // 例外が発生しなければ正常に移動
-        return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $row->id]);
+        return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $game->id]);
     }
 
     // *************************************
     // utils : 衝突を避けるため、action名_メソッド名とすること
     // *************************************
+
+    private function playstore_dealcard(\App\Models\Game $game)
+    {
+        // 参加者全員にカードを配る
+        foreach (explode(",", $game->order) as $player_id) {
+            // 現在の山札を取得
+            $cnames = $game->getCardsByStatus(\App\L\CardState::ID_DECK);
+            $cards = \App\L\CardState::dealCard($cnames, \App\Models\Game::DEAL_CARD_COUNT);
+            $data = [];
+            // データセット用のデータを作成
+            foreach ($cards as $card) {
+                $data[$card] = $player_id;
+            }
+            $game->setData($data);
+        }
+
+        // 最後に先頭札を設定
+        $cnames = $game->getCardsByStatus(\App\L\CardState::ID_DECK);
+        $head = \App\L\CardState::dealCard($cnames, 1);
+        $game->{$head[0]} = \App\L\CardState::ID_HEAD;
+
+        return $game;
+    }
 }

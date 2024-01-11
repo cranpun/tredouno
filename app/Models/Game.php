@@ -16,6 +16,8 @@ class Game extends Model
 
     public $players;
 
+    public const DEAL_CARD_COUNT = 7;
+
     public static function validaterule(): array
     {
         $ret = [
@@ -24,6 +26,30 @@ class Game extends Model
         ];
         foreach (self::cardNames() as $cn) {
             $ret[$cn] = "integer|required";
+        }
+        return $ret;
+    }
+
+    public function getCards()
+    {
+        $ret = [];
+        $arr = $this->toArray();
+        foreach (\App\Models\Game::cardnames() as $cname) {
+            // 状態の指定があれば、それのみ。なければ全て。
+            $ret[$cname] = $arr[$cname];
+        }
+        return $ret;
+    }
+
+    public function getCardsByStatus($cardStatus)
+    {
+        $ret = [];
+        $arr = $this->toArray();
+        foreach (\App\Models\Game::cardnames() as $cname) {
+            if ($arr[$cname] == $cardStatus) {
+                // 状態の指定があれば、それのみ。なければ全て。
+                $ret[] = $cname;
+            }
         }
         return $ret;
     }
@@ -92,10 +118,16 @@ class Game extends Model
 
     public function addOrder($user_id)
     {
-        $orders = explode(",", $this->order);
-        if (!in_array($user_id, $orders)) {
-            $orders[] = $user_id;
-            $this->order = join(",", $orders);
+        if ($this->order) {
+            // 既にプレイヤーがいれば、重複チェックしつつ追加
+            $orders = explode(",", $this->order);
+            if (!in_array($user_id, $orders)) {
+                $orders[] = $user_id;
+                $this->order = join(",", $orders);
+            }
+        } else {
+            // 初プレイヤーであればそのまま登録
+            $this->order = $user_id;
         }
     }
 
@@ -106,5 +138,13 @@ class Game extends Model
 
     public function setData(array $data)
     {
+        $this->playing = \App\U\U::getd($data, "playing", $this->playing);
+        $this->last_event_at = \App\U\U::getd($data, "last_evet_at", $this->last_event_at);
+        $this->order = \App\U\U::getd($data, "order", $this->order);
+
+        // カードの状態
+        foreach (\App\Models\Game::cardNames() as $card) {
+            $this->{$card} = \App\U\U::getd($data, $card, $this->{$card});
+        }
     }
 }
