@@ -13,7 +13,7 @@ class Game extends Model
         "id",
     ];
     const CARD_PREFIX = "cd_";
-    
+
     public $players;
 
     public static function validaterule(): array
@@ -80,9 +80,9 @@ class Game extends Model
         $players = \App\Models\User::whereIn("user.id", $user_ids)->get();
         // 並び順を調整
         $this->players = [];
-        foreach($user_ids as $user_id) {
-            foreach($players as $player) {
-                if($player->id == $user_id) {
+        foreach ($user_ids as $user_id) {
+            foreach ($players as $player) {
+                if ($player->id == $user_id) {
                     $this->players[] = $player;
                     break;
                 }
@@ -93,10 +93,15 @@ class Game extends Model
     public function addOrder($user_id)
     {
         $orders = explode(",", $this->order);
-        if(!in_array($user_id, $orders)) {
+        if (!in_array($user_id, $orders)) {
             $orders[] = $user_id;
             $this->order = join(",", $orders);
         }
+    }
+
+    public function isPlaying()
+    {
+        return $this->playing == \App\L\OnOff::ID_ON;
     }
 
     public function setData(array $data)

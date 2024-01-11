@@ -23,21 +23,20 @@
     </a>
 
     <h1>{{ $game->created_at }}の部屋</h1>
-
     <div>
-        <h2>プレイヤーと残り枚数</h2>
+        <h2>プレイヤー</h2>
         <ul>
             @foreach ($game->players as $player)
                 <li>{{ $player->display_name }}</li>
             @endforeach
         </ul>
     </div>
+
     <div>
-        <h2>あなたの持ち札</h2>
-        <ul>
-            @foreach ($game->players as $player)
-                <li>{{ $player->display_name }}</li>
-            @endforeach
-        </ul>
+        <form method="POST" enctype="multipart/form-data" class="simple-form"
+            action="{{ route(\App\Models\User::user()->pr('-game-playstore'), ['game_id' => $game->id]) }}">
+            @csrf
+            <button type="submit">始める</button>
+        </form>
     </div>
 @endsection

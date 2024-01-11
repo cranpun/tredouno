@@ -12,6 +12,12 @@ trait GameTraitEnterstore
         // $val = \App\Models\Lesson::validaterule();
         // \Validator::make($data, $val)->validate(); // throw exception
 
+        $game = \App\Models\Game::find($game_id);
+        if ($game->isPlaying()) {
+            // play中のゲームなのでplayへ移動
+            return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $game->id]);
+        }
+
         try {
             $row = \DB::transaction(function () use ($game_id){
                 $row = \App\U\U::save(function () use ($game_id) {
@@ -25,7 +31,7 @@ trait GameTraitEnterstore
                 return $row;
             });
 
-            return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $row->id]);
+            return redirect()->route(\App\Models\User::user()->pr("-game-ready"), ['game_id' => $row->id]);
         } catch (\Exception $e) {
             return back()->with("message-error", $e->getMessage())->withInput();
         }

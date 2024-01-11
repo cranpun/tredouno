@@ -27,7 +27,7 @@ trait GameTraitCreatestore
             });
             $mes = "登録しました。";
 
-            return redirect()->route(\App\Models\User::user()->pr("-game-play"), ['game_id' => $row->id]);
+            return redirect()->route(\App\Models\User::user()->pr("-game-ready"), ['game_id' => $row->id]);
         } catch (\Exception $e) {
             return back()->with("message-error", $e->getMessage())->withInput();
         }
