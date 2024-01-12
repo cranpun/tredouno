@@ -15,6 +15,16 @@ trait GameTraitPlay
         $game = \App\Models\Game::find($game_id);
         $game->loadPlayers();
 
+        // 自分のターンであればturn情報を作成
+        $user_id = \App\Models\User::user()->id;
+        if($game->isTurn($user_id)) {
+            $game->turninfo = [];
+            $cards = $game->getCardsByStatus($user_id);
+            $game->turninfo["groups"] = \App\S\CardName::makePutGroups($cards);
+        } else {
+            $game->turninfo = null;
+        }
+
         return view("admin.game.play.main", compact(["game"]));
     }
 

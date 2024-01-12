@@ -20,7 +20,6 @@ trait GameTraitCreatestore
                     $row->last_event_at = now();
                     $row->addOrder($user->id);
                     $row->save();
-                    \Log::info(print_r($row, true));
                     return $row;
                 }, "登録に失敗しました。");
                 return $row;

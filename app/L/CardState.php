@@ -25,7 +25,7 @@ class CardState extends ZzzLabel
             $maxCname = count($cnames) - 1;
             $deal = random_int(0, $maxCname);
             $ret[] = $cnames[$deal];
-            unset($cnames[$deal]); // このカードは配ったので対象外
+            array_splice($cnames, $deal, 1); // このカードは配ったので対象外
         }
         return $ret;
     }

@@ -12,9 +12,9 @@ class Game extends Model
     protected $guarded = [
         "id",
     ];
-    const CARD_PREFIX = "cd_";
 
     public $players;
+    public $turninfo;
 
     public const DEAL_CARD_COUNT = 7;
 
@@ -24,7 +24,7 @@ class Game extends Model
             "playing" => "integer|required",
             "order" => "string|required",
         ];
-        foreach (self::cardNames() as $cn) {
+        foreach (\App\S\CardName::cardNames() as $cn) {
             $ret[$cn] = "integer|required";
         }
         return $ret;
@@ -34,7 +34,7 @@ class Game extends Model
     {
         $ret = [];
         $arr = $this->toArray();
-        foreach (\App\Models\Game::cardnames() as $cname) {
+        foreach (\App\S\CardName::cardnames() as $cname) {
             // 状態の指定があれば、それのみ。なければ全て。
             $ret[$cname] = $arr[$cname];
         }
@@ -45,7 +45,7 @@ class Game extends Model
     {
         $ret = [];
         $arr = $this->toArray();
-        foreach (\App\Models\Game::cardnames() as $cname) {
+        foreach (\App\S\CardName::cardNames() as $cname) {
             if ($arr[$cname] == $cardStatus) {
                 // 状態の指定があれば、それのみ。なければ全て。
                 $ret[] = $cname;
@@ -54,50 +54,10 @@ class Game extends Model
         return $ret;
     }
 
-    public static function cardNames(): array
+    public function getHeadCard()
     {
-        // 以下、カードの種類。
-        // -3 : 山札
-        // -2 : 捨て札
-        // -1 : 先頭札
-        // https://mattel.co.jp/wp-content/uploads/2022/07/uno_minimalista.pdf
-
-        $ret = [];
-        $p = self::CARD_PREFIX;
-
-        foreach (["r", "g", "b", "y"] as $clr) {
-            // // 数字、色ごとに。
-            // 1から9
-            for ($i = 1; $i <= 9; $i++) {
-                // 1～9は2枚ずつ
-                $ret[] = "{$p}{$clr}_num0{$i}_1";
-                $ret[] = "{$p}{$clr}_num0{$i}_2";
-            }
-            // // 数字0は1枚だけ
-            $ret[] = "{$p}{$clr}_num00_1";
-
-            // 文字カードも2枚ずつ
-            foreach ([
-                "draw2",
-                "reverse",
-                "skip",
-            ] as $chr) {
-                $ret[] = "{$p}{$clr}_{$chr}_1";
-                $ret[] = "{$p}{$clr}_{$chr}_2";
-            }
-        }
-
-        // ワイルドカードは色関係なく8枚
-        for ($i = 1; $i <= 8; $i++) {
-            $ret[] = "{$p}whild_{$i}";
-        }
-
-        // ワイルドドロー4カードは色関係なく4枚
-        for ($i = 1; $i <= 4; $i++) {
-            $ret[] = "{$p}whild4_{$i}";
-        }
-
-        return $ret;
+        $cards = $this->getCardsByStatus(\App\L\CardState::ID_HEAD);
+        return $cards[0];
     }
 
     public function loadPlayers()
@@ -131,9 +91,21 @@ class Game extends Model
         }
     }
 
-    public function isPlaying()
+    public function isPlaying(): bool
     {
         return $this->playing == \App\L\OnOff::ID_ON;
+    }
+
+    public function isTurn($user_id): bool
+    {
+        $players = explode(",", $this->order);
+        if (count($players) <= 0) {
+            // 異常だけどとりあえず
+            return false;
+        } else {
+            $turn_id = $players[0];
+            return $turn_id == $user_id;
+        }
     }
 
     public function setData(array $data)
@@ -143,7 +115,7 @@ class Game extends Model
         $this->order = \App\U\U::getd($data, "order", $this->order);
 
         // カードの状態
-        foreach (\App\Models\Game::cardNames() as $card) {
+        foreach (\App\S\CardName::cardNames() as $card) {
             $this->{$card} = \App\U\U::getd($data, $card, $this->{$card});
         }
     }

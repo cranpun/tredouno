@@ -16,8 +16,10 @@ return new class extends Migration
             $table->string("playing")->default(\App\L\OnOff::ID_OFF)->comment("プレイ中か否か。onならプレイ中");
             $table->datetime("last_event_at")->comment("最後のイベントが発生した日付");
             $table->string("order")->nullable()->comment("プレイ順のユーザID。カンマつなぎ。");
+            $table->string("cardevent")->nullable()->comment("ドロー2等、前回の手番で発生したイベント");
+            $table->string("eventdata")->nullable()->comment("イベントに付随するデータ。重ねられたDRAW2の数とか。");
 
-            foreach (\App\Models\Game::cardNames() as $cn) {
+            foreach (\App\S\CardName::cardNames() as $cn) {
                 $table->integer($cn)->default(\App\L\CardState::ID_DECK); // デフォルトは山札
             }
             $table->timestamps();
