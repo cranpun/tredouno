@@ -76,11 +76,16 @@ class Game extends Model
         }
     }
 
+    public function orderArr()
+    {
+        return explode(",", $this->order);
+    }
+
     public function addOrder($user_id)
     {
         if ($this->order) {
             // 既にプレイヤーがいれば、重複チェックしつつ追加
-            $orders = explode(",", $this->order);
+            $orders = $this->orderArr();
             if (!in_array($user_id, $orders)) {
                 $orders[] = $user_id;
                 $this->order = join(",", $orders);

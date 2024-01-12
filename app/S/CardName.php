@@ -60,12 +60,12 @@ class CardName
 
         // ワイルドカードは色関係なく8枚
         for ($i = 1; $i <= 8; $i++) {
-            $ret[] = "{$p}a_whild_{$i}";
+            $ret[] = "{$p}a_wild_{$i}";
         }
 
         // ワイルドドロー4カードは色関係なく4枚
         for ($i = 1; $i <= 4; $i++) {
-            $ret[] = "{$p}a_whild4_{$i}";
+            $ret[] = "{$p}a_wild4_{$i}";
         }
 
         return $ret;

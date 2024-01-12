@@ -28,14 +28,18 @@ class Tmp extends Command
      */
     public function handle()
     {
-        $game = new \App\Models\Game();
-        $game->addOrder(1);
-        $game->addOrder(2);
-        $game->last_event_at = now();
-        $game->playing = \App\L\OnOff::ID_ON;
-        $game->save();
-        $game = \App\Models\Game::find($game->id);
-        $game = $this->playstore_dealcard($game);
-        $game->delete();
+        // $game = new \App\Models\Game();
+        // $game->addOrder(1);
+        // $game->addOrder(2);
+        // $game->last_event_at = now();
+        // $game->playing = \App\L\OnOff::ID_ON;
+        // $game->save();
+        // $game = \App\Models\Game::find($game->id);
+        // $game = $this->playstore_dealcard($game);
+        // $game->delete();
+
+        $arr = [1,2,3];
+        array_splice($arr, 0, 1);
+        print_r($arr);
     }
 }

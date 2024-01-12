@@ -14,6 +14,9 @@ trait GameTraitPlaystore
                         $game->last_event_at = now();
                         $game->playing = \App\L\OnOff::ID_ON;
                         $game = $this->playstore_dealcard($game);
+
+                        // MYTODO プレイ順をシャッフル
+
                         $game->save();
                         return $game;
                     }, "入室に失敗しました。");

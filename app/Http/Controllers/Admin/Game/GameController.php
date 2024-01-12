@@ -18,5 +18,7 @@ class GameController extends \App\Http\Controllers\Controller
     use \App\Http\Controllers\Admin\Game\GameTraitIndex;
     use \App\Http\Controllers\Admin\Game\GameTraitPlay;
     use \App\Http\Controllers\Admin\Game\GameTraitPlaystore;
+    use \App\Http\Controllers\Admin\Game\GameTraitPullcard;
+    use \App\Http\Controllers\Admin\Game\GameTraitPutcard;
     use \App\Http\Controllers\Admin\Game\GameTraitReady;
 }

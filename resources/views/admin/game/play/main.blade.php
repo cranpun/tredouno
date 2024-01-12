@@ -16,6 +16,7 @@
     // 処理に使うデータ
     $user = \App\Models\User::user();
     $hCard = $game->getHeadCard();
+    // MYTODO イベントがあるならそれに応じたダイアログを。
     ?>
     <style type="text/css">
         header {
@@ -59,11 +60,23 @@
                         <li>
                             {{ $card }}
                             @if (\App\S\CardName::canPutCard($card, $hCard))
-                            【出す】
+                                <form method="POST" enctype="multipart/form-data" class="simple-form"
+                                    style="display: inline-block;"
+                                    action="{{ route(\App\Models\User::user()->pr('-game-putcard'), ['game_id' => $game->id, 'cardname' => $card]) }}">
+                                    @csrf
+                                    <button type="submit" style="padding: 0px 10px;">出す</button>
+                                </form>
                             @endif
                         </li>
                     @endforeach
                 </ul>
+            </div>
+            <div>
+                <form method="POST" enctype="multipart/form-data" class="simple-form" style="display: inline-block;"
+                    action="{{ route(\App\Models\User::user()->pr('-game-pullcard'), ['game_id' => $game->id]) }}">
+                    @csrf
+                    <button type="submit" style="padding: 0px 10px;">山札からカードを引く</button>
+                </form>
             </div>
         @else
             <h2>{{ $game->players[0]->display_name }}の番です</h2>

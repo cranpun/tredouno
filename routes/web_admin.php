@@ -29,4 +29,6 @@ Route::middleware(["can:{$role}", "auth"])->prefix($role)->group(function () use
     Route::post("/game/playstore/{game_id}", [GameController::class, "playstore"])->name("{$role}-game-playstore");
     Route::get("/game/play/{game_id}", [GameController::class, "play"])->name("{$role}-game-play");
     Route::get("/game/ready/{game_id}", [GameController::class, "ready"])->name("{$role}-game-ready");
+    Route::post("/game/pullcard/{game_id}", [GameController::class, "pullcard"])->name("{$role}-game-pullcard");
+    Route::post("/game/putcard/{game_id}/{cardname}", [GameController::class, "putcard"])->name("{$role}-game-putcard");
 });
