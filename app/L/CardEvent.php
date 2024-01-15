@@ -4,16 +4,16 @@ namespace App\L;
 
 class CardEvent extends ZzzLabel
 {
-    const ID_DRAW = -3;
-    const ID_PLACE = -2;
-    const ID_HEAD = -1;
+    const ID_DRAW = "draw";
+    const ID_WILD = "wild";
+    const ID_WILD4 = "wild4";
+    const ID_END = "end";
 
     public function labels()
     {
         return [
-            self::ID_DECK => "山札",
-            self::ID_PLACE => "捨て札",
-            self::ID_HEAD => "先頭札",
+            self::ID_DRAW => "ドロー",
+            self::ID_END => "ゲーム終了",
         ];
     }
 }

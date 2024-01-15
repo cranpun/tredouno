@@ -28,7 +28,7 @@
         <b>戻る</b>
     </a>
 
-    <h1>{{ $game->created_at }}の部屋</h1>
+    <h1>ID. {{ $game->id }} ({{ $game->created_at }})の部屋</h1>
 
     <div>
         <h2>プレイヤーと残り枚数</h2>

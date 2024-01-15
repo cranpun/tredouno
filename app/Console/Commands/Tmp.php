@@ -39,7 +39,8 @@ class Tmp extends Command
         // $game->delete();
 
         $arr = [1,2,3];
-        array_splice($arr, 0, 1);
+        // array_splice($arr, 0, 1);
+        shuffle($arr);
         print_r($arr);
     }
 }

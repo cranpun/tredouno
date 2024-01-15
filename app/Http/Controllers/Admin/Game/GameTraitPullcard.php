@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\Game;
 
 trait GameTraitPullcard
 {
-    // MYTODO 実装
     public function pullcard(\Illuminate\Http\Request $request, $game_id)
     {
         $game = \App\Models\Game::find($game_id);
