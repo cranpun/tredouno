@@ -16,10 +16,10 @@ trait GameTraitPlaystore
                         $game->playing = \App\L\OnOff::ID_ON;
                         $game = $this->playstore_dealcard($game);
 
-                        // MYTODO プレイ順をシャッフル。開発時は無効。
-                        // $odr = $game->orderArr();
-                        // shuffle($odr);
-                        // $game->order = join(",", $odr);
+                        // プレイ順をシャッフル
+                        $odr = $game->orderArr();
+                        shuffle($odr);
+                        $game->order = join(",", $odr);
 
                         $game->save();
                         return $game;

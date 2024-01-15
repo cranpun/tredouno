@@ -13,11 +13,11 @@ trait GameTraitPutcard
                 $ret = redirect()->route($user->pr("-game-play"), ['game_id' => $game->id]);
                 $head = $game->getHeadCard();
                 $hands = $game->getCardsByStatus($user->id);
+                $card = new \App\S\CardName($cardname);
 
-                // MYTODO 最後の一枚が出せるカード（数字）か確認
 
                 // 一応出せるカードか確認
-                if (!\App\S\CardName::canPutCard($cardname, $head)) {
+                if (!\App\S\CardName::canPutCard($cardname, $head, $game->cardevent, $game->eventdata)) {
                     return $ret->with("message-error", "出せるカードではありませんでした。");
                 }
 
@@ -33,24 +33,41 @@ trait GameTraitPutcard
                 $game->{$cardname} = \App\L\CardState::ID_HEAD;
                 $head = $game->getHeadCard(); // 変数値更新
 
-                // MYTODO カードがイベント札であればイベント情報を登録
-                // ドロー2、ドロー4くらい？
-
-                // 順番に関する操作
-                // // MYTODO skipとリバース、はそのように
-                // // それ以外は今の人
-                $odr = $game->orderArr();
-                $last = array_shift($odr);
-                $odr[] = $last; // last == 今のuser_id
-                $game->order = join(",", $odr);
-
+                // cardeventの設定。else以外ではもう一回出した人の手番。
                 if (count($hands) == 1) {
                     //  最後の1枚を出したのでゲームおしまい。eventに終了フラグを設定
                     $game->playing = \App\L\OnOff::ID_OFF;
                     $game->cardevent = \App\L\CardEvent::ID_END;
                     // readyにリダイレクト
                     $ret = redirect()->route($user->pr("-game-ready"), ['game_id' => $game->id]);
+                } else if ($card->kind == "wild") {
+                    // wild
+                    $game->setCardEvent(\App\L\CardEvent::ID_COLOR_WILD, null);
+                    $ret->with("message-success", "色を選択してください。");
+                } else if ($card->kind == "wild4") {
+                    // wild4
+                    // wild draw4の色選択と嘘つき確認
+                    $game->setCardEvent(\App\L\CardEvent::ID_COLOR_WILD4, null);
+                    $ret->with("message-success", "色を選択してください。");
+                } else {
+
+
+                    // MYTODO カードがイベント札であればイベント情報を登録
+                    // ドロー2、ドロー4くらい？
+
+                    $game->setCardEvent(null, null); // 通常のターンになるので、リセット。
+
+                    // 順番に関する操作
+                    // // MYTODO skipとリバース、はそのように
+                    // // それ以外は今の人
+                    $odr = $game->orderArr();
+                    $last = array_shift($odr);
+                    $odr[] = $last; // last == 今のuser_id
+                    $game->order = join(",", $odr);
                 }
+
+                // MYTODO UNOと叫ぶ
+                // MYTODO 最後の一枚が出せるカード（数字）か確認。そもそも受け取らないようにする or 出せないようにする方がいいか。
 
                 $game = \DB::transaction(function () use ($game) {
                     $game = \App\U\U::save(function () use ($game) {

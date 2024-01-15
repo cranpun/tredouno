@@ -29,21 +29,20 @@ class Game extends Model
         }
         return $ret;
     }
-    
+
     public function init()
     {
         // 全カードを山に
         $names = \App\S\CardName::cardNames();
-        foreach($names as $name) {
+        foreach ($names as $name) {
             $this->{$name} = \App\L\CardState::ID_DECK;
         }
 
         // 各種パラメータを初期化
-        $this->playing = \App\OnOff::ID_OFF;
+        $this->playing = \App\L\OnOff::ID_OFF;
         $this->last_event_at = now();
         $this->cardevent = null;
         $this->eventdata = null;
-
     }
 
     public function getCards()
@@ -127,6 +126,12 @@ class Game extends Model
             $turn_id = $players[0];
             return $turn_id == $user_id;
         }
+    }
+
+    public function setCardEvent($event, $data)
+    {
+        $this->cardevent = $event;
+        $this->eventdata = $data;
     }
 
     public function setData(array $data)

@@ -11,6 +11,29 @@ class CardName
     public $kind;
     public $num;
 
+    public static function colors(): array
+    {
+        return ["r", "g", "b", "y"];
+    }
+
+    public static function colorName($color): string
+    {
+        switch ($color) {
+            case "r":
+                return "赤";
+            case "g":
+                return "緑";
+            case "b":
+                return "青";
+            case "y":
+                return "黄";
+            case "a":
+                return "wild";
+            default:
+                return "（エラー）";
+        }
+    }
+
     public function __construct(string $cardname)
     {
         $params = explode("_", $cardname);
@@ -36,7 +59,7 @@ class CardName
         $ret = [];
         $p = self::CARD_PREFIX;
 
-        foreach (["r", "g", "b", "y"] as $clr) {
+        foreach (self::colors() as $clr) {
             // // 数字、色ごとに。
             // 1から9
             for ($i = 1; $i <= 9; $i++) {
@@ -77,7 +100,6 @@ class CardName
         return $ret;
     }
 
-
     public static function cardNamesOnlyNum(): array
     {
         $cards = self::cardNames();
@@ -90,7 +112,7 @@ class CardName
         return $ret;
     }
 
-    public static function canPutCard($cname1, $head): bool
+    public static function canPutCard($cname1, $head, $event, $data): bool
     {
         $obj1 = new CardName($cname1);
         $objH = new CardName($head);
@@ -98,6 +120,11 @@ class CardName
         if ($obj1->color == $objH->color) {
             // 同じ色
             return true;
+        } else if (in_array($event, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4])) {
+            // ワイルドカードだったのでheadではなく、dataを確認
+            if ($obj1->color == $data) {
+                return true;
+            }
         } else if ($obj1->kind == $objH->kind) {
             // 同じ種類
             return true;

@@ -25,12 +25,13 @@
     <h1>ID. {{ $game->id }} ({{ $game->created_at }})の部屋</h1>
     @if ($game->cardevent == \App\L\CardEvent::ID_END)
         @foreach ($game->players as $player)
-        @if(count($game->getCardsByStatus($player->id)) <= 0)
-        <div>
-            <h2>ゲーム終了：勝者 {{ $player->display_name; }} </h2>
-        </div>
-        @endif
+            @if (count($game->getCardsByStatus($player->id)) <= 0)
+                <div>
+                    <h2>ゲーム終了：勝者 {{ $player->display_name }} </h2>
+                </div>
+            @endif
         @endforeach
+        MYTODO 終了時点のカードの状態とか出したほうがいいかも？
     @endif
     <div>
         <h2>プレイヤー</h2>
