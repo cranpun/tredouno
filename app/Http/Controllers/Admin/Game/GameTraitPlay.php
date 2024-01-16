@@ -20,14 +20,14 @@ trait GameTraitPlay
             return redirect()->route($user->pr('-game-ready'), compact(["game_id"]));
         }
 
-        // 自分のターンであればturn情報を作成
-        if($game->isTurn($user->id)) {
-            $game->turninfo = [];
-            $cards = $game->getCardsByStatus($user->id);
-            $game->turninfo["groups"] = \App\S\CardName::makePutGroups($cards);
-        } else {
-            $game->turninfo = null;
-        }
+        // // 自分のターンであればturn情報を作成。　→ groupは公式ルールでないのでパス
+        // if($game->isTurn($user->id)) {
+        //     $game->turninfo = [];
+        //     $cards = $game->getCardsByStatus($user->id);
+        //     $game->turninfo["groups"] = \App\S\CardName::makePutGroups($cards);
+        // } else {
+        //     $game->turninfo = null;
+        // }
 
         return view("admin.game.play.main", compact(["game"]));
     }

@@ -47,15 +47,18 @@ trait GameTraitPutcard
                 } else if ($card->kind == "wild4") {
                     // wild4
                     // wild draw4の色選択と嘘つき確認
+                    // MYTODO4枚引く処理
                     $game->setCardEvent(\App\L\CardEvent::ID_COLOR_WILD4, null);
                     $ret->with("message-success", "色を選択してください。");
                 } else {
 
-
-                    // MYTODO カードがイベント札であればイベント情報を登録
-                    // ドロー2、ドロー4くらい？
-
-                    $game->setCardEvent(null, null); // 通常のターンになるので、リセット。
+                    // ここから先は順番変更を含む処理 MYTODO wild4はこことも絡めないと…？
+                    if ($card->kind == "draw2") {
+                        $game->setCardEvent(\App\L\CardEvent::ID_DRAW2, null);
+                    } else {
+                        // その他のカード
+                        $game->setCardEvent(null, null); // 通常のターンになるので、リセット。
+                    }
 
                     // 順番に関する操作
                     // // MYTODO skipとリバース、はそのように

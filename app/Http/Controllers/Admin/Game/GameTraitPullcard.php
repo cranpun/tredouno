@@ -14,19 +14,13 @@ trait GameTraitPullcard
             if ($game->isTurn($user->id)) {
                 try {
                     $game->last_event_at = now();
-                    $decks = $game->getCardsByStatus(\App\L\CardState::ID_DECK);
-                    if (count($decks) <= 0) {
-                        // 山札がないので、捨て札を山札に戻す。その時、それらのカードが山札になるので変数上書き
-                        $decks = $game->getCardsByStatus(\App\L\CardState::ID_PLACE);
-                        $data = [];
-                        foreach ($decks as $p) {
-                            $data[$p] = \App\L\CardState::ID_DECK;
-                        }
-                    }
-                    $pullname = \App\L\CardState::dealCard($decks, 1);
-                    $game->{$pullname[0]} = $user->id;
+                    $pullname = $game->deal($user->id, 1);
 
-                    if (\App\S\CardName::canPutCard($pullname[0], $game->getHeadCard(), $game->cardevent, $game->eventdata)) {
+                    // draw系等、引いた後には出せないカードの判定
+                    $cardObj = new \App\S\CardName($pullname[0]);
+                    $isAllow = !in_array($cardObj->kind, ["wild4", "draw2"]); // これ以外ならOK
+
+                    if ($isAllow && \App\S\CardName::canPutCard($pullname[0], $game->getHeadCard(), $game->cardevent, $game->eventdata)) {
                         // 出せるカードだったら出す。
                         if ($game->cardevent) {
                             // 有効なCardEventの最中だったら次に渡すために保持

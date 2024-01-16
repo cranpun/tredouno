@@ -42,21 +42,14 @@ trait GameTraitPlaystore
     private function playstore_dealcard(\App\Models\Game $game)
     {
         // 本来のルールとは違うけど、最初に先頭札を決める。ランダムで数字出すののやり直しを防ぐため。
+        // $game->dealだと数字だけに限定できないので特別対応。
         $cnames = \App\S\CardName::cardNamesOnlyNum();
         $head = \App\L\CardState::dealCard($cnames, 1);
         $game->{$head[0]} = \App\L\CardState::ID_HEAD;
 
         // 参加者全員にカードを配る
         foreach (explode(",", $game->order) as $player_id) {
-            // 現在の山札を取得
-            $cnames = $game->getCardsByStatus(\App\L\CardState::ID_DECK);
-            $cards = \App\L\CardState::dealCard($cnames, \App\Models\Game::DEAL_CARD_COUNT);
-            $data = [];
-            // データセット用のデータを作成
-            foreach ($cards as $card) {
-                $data[$card] = $player_id;
-            }
-            $game->setData($data);
+            $game->deal($player_id, \App\Models\Game::DEAL_CARD_COUNT);
         }
 
         return $game;

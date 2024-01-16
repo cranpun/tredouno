@@ -14,6 +14,18 @@ trait GameTraitPass
             if ($game->isTurn($user->id)) {
                 try {
                     $game->last_event_at = now();
+
+                    // DRAW系のイベントだったらカードを引く
+                    $dp = [
+                        \App\L\CardEvent::ID_DRAW2 => 2,
+                        \App\L\CardEvent::ID_WILD4 => 4,
+                    ];
+                    if(in_array($game->cardevent, array_keys($dp))) {
+                        $game->deal($user->id, $dp[$game->cardevent]);
+                        // カードを引いたのでイベントクリア
+                        $game->setCardEvent(null, null);
+                    }
+
                     // 順番を次の人へ
                     $order = $game->orderArr();
                     array_splice($order, 0, 1);

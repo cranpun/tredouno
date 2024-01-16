@@ -46,14 +46,15 @@
         <h2>場の札</h2>
         <div>
             {{ $hCard }}
-            @if(in_array($game->cardevent, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4]))
-            （{{ \App\S\CardName::colorName($game->eventdata) }}）
+            @if (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4]))
+                （{{ \App\S\CardName::colorName($game->eventdata) }}）
             @endif
         </div>
     </div>
     <div>
         @if ($game->isTurn($user->id))
             <h2>あなたの番です</h2>
+            {{--
             <div>
                 <h3>まとめて出せる札</h3>
                 <ul>
@@ -62,6 +63,7 @@
                     @endforeach
                 </ul>
             </div>
+            --}}
             <div>
                 <h3>あなたの持ち札</h3>
                 <ul>
@@ -87,13 +89,28 @@
                         @csrf
                         <button type="submit" class="is-mini">このまま持つ</button>
                     </form>
+                @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_DRAW2, \App\L\CardEvent::ID_WILD4]))
+                <h3>ドロー系のカードが使われました。カードを引いてください。</h3>
+                <form method="POST" enctype="multipart/form-data" class="simple-form" style="display: inline-block;"
+                        action="{{ route(\App\Models\User::user()->pr('-game-pass'), ['game_id' => $game->id]) }}">
+                        @csrf
+                        <button type="submit" class="is-mini">{{ $game->cardevent == \App\L\CardEvent::ID_DRAW2 ? 2 : 4 }}枚カードを引く</button>
+                    </form>
                 @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_COLOR_WILD, \App\L\CardEvent::ID_COLOR_WILD4]))
+                    <?php
+                        $btnclrs = [
+                            "r" => "red",
+                            "g" => "green",
+                            "b" => "blue",
+                            "y" => "yellow",
+                        ];
+                    ?>
                     @foreach (\App\S\CardName::colors() as $clr)
                         <form method="POST" enctype="multipart/form-data" class="simple-form"
                             style="display: inline-block;"
                             action="{{ route(\App\Models\User::user()->pr('-game-color'), ['game_id' => $game->id, 'color' => $clr]) }}">
                             @csrf
-                            <button type="submit" class="is-mini">
+                            <button type="submit" class="is-mini" style="border: none; background-color: {{ $btnclrs[$clr] }}; color: #CCCCCC;">
                                 {{ \App\S\CardName::colorName($clr) }}
                             </button>
                         </form>

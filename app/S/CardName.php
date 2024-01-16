@@ -117,19 +117,34 @@ class CardName
         $obj1 = new CardName($cname1);
         $objH = new CardName($head);
 
-        if ($obj1->color == $objH->color) {
-            // 同じ色
-            return true;
-        } else if (in_array($event, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4])) {
+        if (in_array($event, [\App\L\CardEvent::ID_AFTERPULL]) && $data) {
+            // AFTERPULLの場合、evetndataに退避したデータがあるかもしれないのでそれを確認
+            $oData = json_decode($data);
+            if($obj1->color == $oData->eventdata) {
+                return true;
+            }
+        }
+
+        if (in_array($event, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4])) {
             // ワイルドカードだったのでheadではなく、dataを確認。MYTODO wild4やdrawは別対応になるかも？
             if ($obj1->color == $data) {
                 return true;
             }
-        } else if ($obj1->kind == $objH->kind) {
+        }
+        if (in_array($event, [\App\L\CardEvent::ID_DRAW2, \App\L\CardEvent::ID_WILD4])) {
+            // 前に出されたカードが攻撃であればどのカードでも出せない
+            return false;
+        }
+        if ($obj1->color == $objH->color) {
+            // 同じ色
+            return true;
+        }
+        if ($obj1->kind == $objH->kind) {
             // 同じ種類
             return true;
-        } else if (in_array($obj1->kind, ["wild", "wild4"])) {
-            // ワイルドカード
+        }
+        if (in_array($obj1->kind, ["wild", "wild4"])) {
+            // このカードがワイルド系
             return true;
         }
 

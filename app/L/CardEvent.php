@@ -4,7 +4,7 @@ namespace App\L;
 
 class CardEvent extends ZzzLabel
 {
-    const ID_DRAW = "draw";
+    const ID_DRAW2 = "draw2";
     const ID_WILD4 = "wild4";
     const ID_WILD = "wild";
     const ID_COLOR_WILD = "colorwild";
@@ -15,7 +15,7 @@ class CardEvent extends ZzzLabel
     public function labels()
     {
         return [
-            self::ID_DRAW => "ドロー",
+            self::ID_DRAW2 => "ドロー2",
             self::ID_WILD => "ワイルド",
             self::ID_WILD4 => "ワイルド4",
             self::ID_COLOR_WILD => "色選択：ワイルド",
