@@ -20,6 +20,17 @@ trait GameTraitPass
                     $order[] = $user->id;
                     $game->order = join(",", $order);
 
+                    // CardEventがeventdataに退避されていたら復旧
+                    if ($game->eventdata) {
+                        $obj = json_decode($game->eventdata);
+                        $game->setCardEvent($obj->cardevent, $game->eventdata = $obj->eventdata);
+                    } else {
+                        // それ以外の場合はリセット
+                        $game->setCardEvent(null, null);
+                    }
+
+                    \Log::info($game);
+
                     $game = \DB::transaction(function () use ($game, $user) {
                         $game = \App\U\U::save(function () use ($game, $user) {
                             $game->save();

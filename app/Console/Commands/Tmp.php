@@ -38,9 +38,10 @@ class Tmp extends Command
         // $game = $this->playstore_dealcard($game);
         // $game->delete();
 
-        $arr = [1,2,3];
-        // array_splice($arr, 0, 1);
-        shuffle($arr);
-        print_r($arr);
+        $v = json_encode(["cardevent" => "hoge", "eventdata" => "fuga"]);
+        $v1 = json_encode(["cardevent" => "bar", "eventdata" => '{"cardevent":"hoge","eventdata":"fuga"}']);
+        $obj = json_decode('{"cardevent":"bar","eventdata":"{\"cardevent\":\"hoge\",\"eventdata\":\"fuga\"}"}');
+        print_r($obj);
+        print_r(json_decode($obj->eventdata));
     }
 }

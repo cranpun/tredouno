@@ -30,7 +30,7 @@ Route::middleware(["can:{$role}", "auth"])->prefix($role)->group(function () use
     Route::get("/game/play/{game_id}", [GameController::class, "play"])->name("{$role}-game-play");
     Route::get("/game/ready/{game_id}", [GameController::class, "ready"])->name("{$role}-game-ready");
     Route::post("/game/pullcard/{game_id}", [GameController::class, "pullcard"])->name("{$role}-game-pullcard");
-    Route::post("/game/pass/{game_id}", [GameController::class, "pullcard"])->name("{$role}-game-pass");
+    Route::post("/game/pass/{game_id}", [GameController::class, "pass"])->name("{$role}-game-pass");
     Route::post("/game/color/{game_id}/{color}", [GameController::class, "color"])->name("{$role}-game-color");
     Route::post("/game/putcard/{game_id}/{cardname}", [GameController::class, "putcard"])->name("{$role}-game-putcard");
 });

@@ -26,10 +26,18 @@ trait GameTraitPullcard
                     $pullname = \App\L\CardState::dealCard($decks, 1);
                     $game->{$pullname[0]} = $user->id;
 
-                    // 出せるカードだったら出す。
-                    // MYTODO 要検討。wildのときにpullしたら上書きしちゃう。eventdataか何かに退避させて復帰するつくりをしないと。
                     if (\App\S\CardName::canPutCard($pullname[0], $game->getHeadCard(), $game->cardevent, $game->eventdata)) {
-                        $game->setCardEvent(\App\L\CardEvent::ID_AFTERPULL, null);
+                        // 出せるカードだったら出す。
+                        if ($game->cardevent) {
+                            // 有効なCardEventの最中だったら次に渡すために保持
+                            $eventdata = json_encode([
+                                "cardevent" => $game->cardevent,
+                                "eventdata" => $game->eventdata,
+                            ]);
+                        } else {
+                            $eventdata = null;
+                        }
+                        $game->setCardEvent(\App\L\CardEvent::ID_AFTERPULL, $eventdata);
                         $ret->with("message-success", "出せるカードを引きました。出すのであれば選択してください。そのままであればパスを押してください。");
                     } else {
                         // 順番を次の人へ
