@@ -58,14 +58,22 @@ trait GameTraitPutcard
                     }
 
                     // 順番に関する操作
-                    // // MYTODO skipとリバース、はそのように
-                    // // それ以外は今の人
-                    $odr = $game->orderArr();
-                    $last = array_shift($odr);
-                    $odr[] = $last; // last == 今のuser_id
-                    $game->order = join(",", $odr);
+                    $order = $game->orderArr();
+                    if (($card->kind == "skip") // skipか
+                        || $card->kind == "reverse" && count($order) == 2
+                    ) // 二人の時のreverse
+                    {
+                        // 次の次の人。
+                        $game->nextOrder();
+                        $game->nextOrder();
+                    } else if ($card->kind == "reverse") {
+                        // 3人以上のリバースは並び順を逆に
+                        $game->order = join(",", array_reverse($order));
+                    } else {
+                        // // それ以外は単純に次の人
+                        $game->nextOrder();
+                    }
                 }
-
 
                 // 今の先頭札を捨て札に
                 $game->{$head} = \App\L\CardState::ID_PLACE;
@@ -82,6 +90,7 @@ trait GameTraitPutcard
                     return $game;
                 });
             } catch (\Exception $e) {
+                \Log::error($e);
                 return back()->with("message-error", $e->getMessage())->withInput();
             }
         }

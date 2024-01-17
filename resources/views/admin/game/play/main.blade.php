@@ -37,7 +37,13 @@
         <h2>プレイヤーと残り枚数</h2>
         <ul>
             @foreach ($game->players as $player)
-                <li>{{ $player->display_name }} ({{ count($game->getCardsByStatus($player->id)) }})</li>
+                <?php $cnt = count($game->getCardsByStatus($player->id)); ?>
+                <li>
+                    {{ $player->display_name }} ({{ $cnt }})
+                    @if($cnt == 1)
+                    【UNO!】
+                    @endif
+                </li>
             @endforeach
         </ul>
     </div>

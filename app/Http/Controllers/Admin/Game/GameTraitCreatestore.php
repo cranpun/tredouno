@@ -28,6 +28,7 @@ trait GameTraitCreatestore
 
             return redirect()->route(\App\Models\User::user()->pr("-game-ready"), ['game_id' => $row->id]);
         } catch (\Exception $e) {
+            \Log::error($e);
             return back()->with("message-error", $e->getMessage())->withInput();
         }
     }

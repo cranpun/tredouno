@@ -27,6 +27,7 @@ trait GameTraitPlaystore
                     return $game;
                 });
             } catch (\Exception $e) {
+                \Log::error($e);
                 return back()->with("message-error", $e->getMessage())->withInput();
             }
         }

@@ -41,10 +41,7 @@ trait GameTraitChallenge
                     $game->setCardEvent(\App\L\CardEvent::ID_WILD, $eventdata->color);
 
                     // 順番を次の人へ
-                    $order = $game->orderArr();
-                    array_splice($order, 0, 1);
-                    $order[] = $user->id;
-                    $game->order = join(",", $order);
+                    $game->nextOrder();
 
                     $game = \DB::transaction(function () use ($game, $user) {
                         $game = \App\U\U::save(function () use ($game, $user) {

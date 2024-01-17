@@ -41,11 +41,22 @@
         </ul>
     </div>
 
-    <div>
-        <form method="POST" enctype="multipart/form-data" class="simple-form"
-            action="{{ route(\App\Models\User::user()->pr('-game-playstore'), ['game_id' => $game->id]) }}">
-            @csrf
-            <button type="submit">始める</button>
-        </form>
-    </div>
+    @if (count(explode(',', $game->order)) > 1)
+        <div>
+            <form method="POST" enctype="multipart/form-data" class="simple-form"
+                action="{{ route(\App\Models\User::user()->pr('-game-playstore'), ['game_id' => $game->id]) }}">
+                @csrf
+                <button type="submit">始める</button>
+            </form>
+        </div>
+    @endif
+    {{-- 自動リロード --}}
+    <script type="text/javascript">
+        window.addEventListener("load", function() {
+            setInterval(function() {
+                location.reload();
+            }, 3 * 1000);
+        });
+    </script>
+
 @endsection

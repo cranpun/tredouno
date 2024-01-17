@@ -124,6 +124,14 @@ class Game extends Model
         return explode(",", $this->order);
     }
 
+    public function nextOrder()
+    {
+        $odr = $this->orderArr();
+        $last = array_shift($odr);
+        $odr[] = $last; // last == 今のuser_id
+        $this->order = join(",", $odr);
+}
+
     public function addOrder($user_id)
     {
         if ($this->order) {

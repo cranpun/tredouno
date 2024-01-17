@@ -35,10 +35,7 @@ trait GameTraitPullcard
                         $ret->with("message-success", "出せるカードを引きました。出すのであれば選択してください。そのままであればパスを押してください。");
                     } else {
                         // 順番を次の人へ
-                        $order = $game->orderArr();
-                        array_splice($order, 0, 1);
-                        $order[] = $user->id;
-                        $game->order = join(",", $order);
+                        $game->nextOrder();
                     }
 
                     $game = \DB::transaction(function () use ($game, $user) {
@@ -49,6 +46,7 @@ trait GameTraitPullcard
                         return $game;
                     });
                 } catch (\Exception $e) {
+                    \Log::error($e);
                     return back()->with("message-error", $e->getMessage())->withInput();
                 }
             }
