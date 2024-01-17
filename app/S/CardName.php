@@ -125,8 +125,8 @@ class CardName
             }
         }
 
-        if (in_array($event, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4])) {
-            // ワイルドカードだったのでheadではなく、dataを確認。MYTODO wild4やdrawは別対応になるかも？
+        if (in_array($event, [\App\L\CardEvent::ID_WILD])) {
+            // ワイルドカードだったのでheadではなく、dataを確認。
             if ($obj1->color == $data) {
                 return true;
             }

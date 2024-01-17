@@ -16,14 +16,18 @@ trait GameTraitPass
                     $game->last_event_at = now();
 
                     // DRAW系のイベントだったらカードを引く
-                    $dp = [
-                        \App\L\CardEvent::ID_DRAW2 => 2,
-                        \App\L\CardEvent::ID_WILD4 => 4,
-                    ];
-                    if(in_array($game->cardevent, array_keys($dp))) {
-                        $game->deal($user->id, $dp[$game->cardevent]);
-                        // カードを引いたのでイベントクリア
+                    if ($game->cardevent == \App\L\CardEvent::ID_DRAW2) {
+                        $game->deal($user->id,  2);
+                        // カードを引いたのでイベントを書き換え
                         $game->setCardEvent(null, null);
+                    } else if ($game->cardevent == \App\L\CardEvent::ID_WILD4) {
+                        $game->deal($user->id,  4);
+                        // カードを引いたのでイベントを書き換え。wild4が終わったので、ただのwildに。色は積んであるはず。
+                        $game->setCardEvent(\App\L\CardEvent::ID_WILD, $game->eventdata);
+                    } else if ($game->cardevent == \App\L\CardEvent::ID_AFTERPULL && $game->eventdata) {
+                        // afterpullの後、退避しているデータがあれば復旧
+                        $obj = json_decode($game->eventdata);
+                        $game->setCardEvent($obj->cardevent, $game->eventdata = $obj->eventdata);
                     }
 
                     // 順番を次の人へ
@@ -32,25 +36,15 @@ trait GameTraitPass
                     $order[] = $user->id;
                     $game->order = join(",", $order);
 
-                    // CardEventがeventdataに退避されていたら復旧
-                    if ($game->eventdata) {
-                        $obj = json_decode($game->eventdata);
-                        $game->setCardEvent($obj->cardevent, $game->eventdata = $obj->eventdata);
-                    } else {
-                        // それ以外の場合はリセット
-                        $game->setCardEvent(null, null);
-                    }
-
-                    \Log::info($game);
-
                     $game = \DB::transaction(function () use ($game, $user) {
                         $game = \App\U\U::save(function () use ($game, $user) {
                             $game->save();
                             return $game;
-                        }, "パスに失敗しました。");
+                        }, "失敗しました。");
                         return $game;
                     });
                 } catch (\Exception $e) {
+                    \Log::error($e);
                     return back()->with("message-error", $e->getMessage())->withInput();
                 }
             }
