@@ -53,6 +53,9 @@
     </div>
     <div>
         @if ($game->isTurn($user->id))
+            <?php
+            $cards = $game->getCardsByStatus(\App\Models\User::user()->id);
+            ?>
             <h2>あなたの番です</h2>
             {{--
             <div>
@@ -67,7 +70,7 @@
             <div>
                 <h3>あなたの持ち札</h3>
                 <ul>
-                    @foreach ($game->getCardsByStatus(\App\Models\User::user()->id) as $card)
+                    @foreach ($cards as $card)
                         <li>
                             {{ $card }}
                             @if (\App\S\CardName::canPutCard($card, $hCard, $game->cardevent, $game->eventdata))
@@ -75,7 +78,14 @@
                                     style="display: inline-block;"
                                     action="{{ route(\App\Models\User::user()->pr('-game-putcard'), ['game_id' => $game->id, 'cardname' => $card]) }}">
                                     @csrf
-                                    <button type="submit" class="is-mini">出す</button>
+                                    <button type="submit" class="is-mini">
+                                        出す
+                                        @if(count($cards) == 2)
+                                        【これを出したらUNO！】
+                                        @elseif(count($cards) == 1)
+                                        【あがり！】
+                                        @endif
+                                    </button>
                                 </form>
                             @endif
                         </li>

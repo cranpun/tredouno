@@ -31,13 +31,12 @@
                 </div>
             @endif
         @endforeach
-        MYTODO 終了時点のカードの状態とか出したほうがいいかも？
     @endif
     <div>
         <h2>プレイヤー</h2>
         <ul>
             @foreach ($game->players as $player)
-                <li>{{ $player->display_name }}</li>
+                <li>{{ $player->display_name }} ({{ count($game->getCardsByStatus($player->id)) }})</li>
             @endforeach
         </ul>
     </div>
