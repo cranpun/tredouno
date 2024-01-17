@@ -14,6 +14,7 @@ class GameController extends \App\Http\Controllers\Controller
     // action
     // *********************************************************
     use \App\Http\Controllers\Admin\Game\GameTraitColor;
+    use \App\Http\Controllers\Admin\Game\GameTraitChallenge;
     use \App\Http\Controllers\Admin\Game\GameTraitCreatestore;
     use \App\Http\Controllers\Admin\Game\GameTraitEnterstore;
     use \App\Http\Controllers\Admin\Game\GameTraitIndex;

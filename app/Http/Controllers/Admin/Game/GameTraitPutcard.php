@@ -26,13 +26,6 @@ trait GameTraitPutcard
                     return $ret->with("message-error", "手持ちのカードではありませんでした。");
                 }
 
-                // 今の先頭札を捨て札に
-                $game->{$head} = \App\L\CardState::ID_PLACE;
-
-                // 今回のカードを先頭札に（＝自分の手札から消える）
-                $game->{$cardname} = \App\L\CardState::ID_HEAD;
-                $head = $game->getHeadCard(); // 変数値更新
-
                 // cardeventの設定。else以外ではもう一回出した人の手番。
                 if (count($hands) == 1) {
                     //  最後の1枚を出したのでゲームおしまい。eventに終了フラグを設定
@@ -46,13 +39,17 @@ trait GameTraitPutcard
                     $ret->with("message-success", "色を選択してください。");
                 } else if ($card->kind == "wild4") {
                     // wild4
-                    // wild draw4の色選択と嘘つき確認
-                    // MYTODO4枚引く処理
-                    $game->setCardEvent(\App\L\CardEvent::ID_COLOR_WILD4, null);
-                    $ret->with("message-success", "色を選択してください。");
+                    // チャレンジのために現在の状態をeventdataに設定
+                    $json = json_encode([
+                        "head" => $head,
+                        "cardevent" => $game->cardevent,
+                        "eventdata" => $game->eventdata,
+                    ]);
+                    $game->setCardEvent(\App\L\CardEvent::ID_COLOR_WILD4, $json);
+                    $ret->with("message-success", "色を選択してください。またこのあと次の人がチャレンジします。成功した場合カードが増えます。");
                 } else {
 
-                    // ここから先は順番変更を含む処理 MYTODO wild4はこことも絡めないと…？
+                    // ここから先は順番変更を含む処理
                     if ($card->kind == "draw2") {
                         $game->setCardEvent(\App\L\CardEvent::ID_DRAW2, null);
                     } else {
@@ -69,8 +66,13 @@ trait GameTraitPutcard
                     $game->order = join(",", $odr);
                 }
 
-                // MYTODO UNOと叫ぶ
-                // MYTODO 最後の一枚が出せるカード（数字）か確認。そもそも受け取らないようにする or 出せないようにする方がいいか。
+
+                // 今の先頭札を捨て札に
+                $game->{$head} = \App\L\CardState::ID_PLACE;
+
+                // 今回のカードを先頭札に（＝自分の手札から消える）
+                $game->{$cardname} = \App\L\CardState::ID_HEAD;
+                $head = $game->getHeadCard(); // 変数値更新
 
                 $game = \DB::transaction(function () use ($game) {
                     $game = \App\U\U::save(function () use ($game) {

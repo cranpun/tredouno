@@ -19,13 +19,22 @@ trait GameTraitColor
             if ($game->isTurn($user->id)) {
                 try {
                     $game->last_event_at = now();
+
+                    if($game->cardevent == \App\L\CardEvent::ID_COLOR_WILD4) {
+                        // wild4の場合は、eventdataがjsonなので色を追加
+                        $obj = json_decode($game->eventdata, true);
+                        $obj["color"] = $color;
+                        $game->setCardEvent(\App\L\CardEvent::ID_WILD4, json_encode($obj));
+                    } else {
+                        // wildなら単純にcolorを設定
+                        $game->setCardEvent(\App\L\CardEvent::ID_WILD, $color);
+                    }
+
                     // 順番を次の人へ
                     $order = $game->orderArr();
                     array_splice($order, 0, 1);
                     $order[] = $user->id;
                     $game->order = join(",", $order);
-
-                    $game->setCardEvent($nextevent[$game->cardevent], $color);
 
                     $game = \DB::transaction(function () use ($game) {
                         $game = \App\U\U::save(function () use ($game) {

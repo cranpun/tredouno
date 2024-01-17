@@ -20,10 +20,6 @@ trait GameTraitPass
                         $game->deal($user->id,  2);
                         // カードを引いたのでイベントを書き換え
                         $game->setCardEvent(null, null);
-                    } else if ($game->cardevent == \App\L\CardEvent::ID_WILD4) {
-                        $game->deal($user->id,  4);
-                        // カードを引いたのでイベントを書き換え。wild4が終わったので、ただのwildに。色は積んであるはず。
-                        $game->setCardEvent(\App\L\CardEvent::ID_WILD, $game->eventdata);
                     } else if ($game->cardevent == \App\L\CardEvent::ID_AFTERPULL && $game->eventdata) {
                         // afterpullの後、退避しているデータがあれば復旧
                         $obj = json_decode($game->eventdata);

@@ -16,7 +16,6 @@
     // 処理に使うデータ
     $user = \App\Models\User::user();
     $hCard = $game->getHeadCard();
-    // MYTODO イベントがあるならそれに応じたダイアログを。
     ?>
     <style type="text/css">
         header {
@@ -43,10 +42,16 @@
         </ul>
     </div>
     <div>
+        <h2>山札の数</h2>
+        <div>
+            {{ count($game->getCardsByStatus(\App\L\CardState::ID_DECK)) }}
+        </div>
+    </div>
+    <div>
         <h2>場の札</h2>
         <div>
             {{ $hCard }}
-            @if (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD, \App\L\CardEvent::ID_WILD4]))
+            @if (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD]))
                 （{{ \App\S\CardName::colorName($game->eventdata) }}）
             @endif
         </div>
@@ -99,40 +104,56 @@
                         @csrf
                         <button type="submit" class="is-mini">このまま持つ</button>
                     </form>
-                @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_DRAW2, \App\L\CardEvent::ID_WILD4]))
-                    <h3>ドロー系のカードが使われました。カードを引いてください。</h3>
+                @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_DRAW2]))
+                    <h3>ドロー2が使われました。カードを引いてください。</h3>
                     <form method="POST" enctype="multipart/form-data" class="simple-form" style="display: inline-block;"
                         action="{{ route(\App\Models\User::user()->pr('-game-pass'), ['game_id' => $game->id]) }}">
                         @csrf
-                        <button type="submit"
-                            class="is-mini">{{ $game->cardevent == \App\L\CardEvent::ID_DRAW2 ? 2 : 4 }}枚カードを引く</button>
+                        <button type="submit" class="is-mini">2枚カードを引く</button>
                     </form>
-                @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_COLOR_WILD, \App\L\CardEvent::ID_COLOR_WILD4]))
-                    <?php
-                    $btnclrs = [
-                        'r' => 'red',
-                        'g' => 'green',
-                        'b' => 'blue',
-                        'y' => 'yellow',
-                    ];
-                    ?>
-                    @foreach (\App\S\CardName::colors() as $clr)
+                @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD4]))
+                    <h3>ワイルドドロー4が使われました。カードを引くか、チャレンジするか選んでください。</h3>
+                    <div><small>※チャレンジ：他に出せるカードがあるのにワイルドドロー4を出したか確認</small>
                         <form method="POST" enctype="multipart/form-data" class="simple-form"
                             style="display: inline-block;"
-                            action="{{ route(\App\Models\User::user()->pr('-game-color'), ['game_id' => $game->id, 'color' => $clr]) }}">
+                            action="{{ route(\App\Models\User::user()->pr('-game-challenge'), ['game_id' => $game->id, 'value' => \App\L\OnOff::ID_OFF]) }}">
                             @csrf
-                            <button type="submit" class="is-mini"
-                                style="border: none; background-color: {{ $btnclrs[$clr] }}; color: #CCCCCC;">
-                                {{ \App\S\CardName::colorName($clr) }}
-                            </button>
+                            <button type="submit" class="is-mini">そのまま4枚カードを引く</button>
                         </form>
-                    @endforeach
-                @else
-                    <form method="POST" enctype="multipart/form-data" class="simple-form" style="display: inline-block;"
-                        action="{{ route(\App\Models\User::user()->pr('-game-pullcard'), ['game_id' => $game->id]) }}">
-                        @csrf
-                        <button type="submit" class="is-mini">山札からカードを引く</button>
-                    </form>
+                        <form method="POST" enctype="multipart/form-data" class="simple-form"
+                            style="display: inline-block;"
+                            action="{{ route(\App\Models\User::user()->pr('-game-challenge'), ['game_id' => $game->id, 'value' => \App\L\OnOff::ID_ON]) }}">
+                            @csrf
+                            <button type="submit" class="is-mini">チャレンジ（失敗の場合は6枚）</button>
+                        </form>
+                    @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_COLOR_WILD, \App\L\CardEvent::ID_COLOR_WILD4]))
+                        <h3>色を選択してください。</h3>
+                        <?php
+                        $btnclrs = [
+                            'r' => 'red',
+                            'g' => 'green',
+                            'b' => 'blue',
+                            'y' => 'yellow',
+                        ];
+                        ?>
+                        @foreach (\App\S\CardName::colors() as $clr)
+                            <form method="POST" enctype="multipart/form-data" class="simple-form"
+                                style="display: inline-block;"
+                                action="{{ route(\App\Models\User::user()->pr('-game-color'), ['game_id' => $game->id, 'color' => $clr]) }}">
+                                @csrf
+                                <button type="submit" class="is-mini"
+                                    style="border: none; background-color: {{ $btnclrs[$clr] }}; color: #CCCCCC;">
+                                    {{ \App\S\CardName::colorName($clr) }}
+                                </button>
+                            </form>
+                        @endforeach
+                    @else
+                        <form method="POST" enctype="multipart/form-data" class="simple-form"
+                            style="display: inline-block;"
+                            action="{{ route(\App\Models\User::user()->pr('-game-pullcard'), ['game_id' => $game->id]) }}">
+                            @csrf
+                            <button type="submit" class="is-mini">山札からカードを引く</button>
+                        </form>
                 @endif
             </div><!-- #div-controll -->
         @else
