@@ -29,7 +29,7 @@ trait GameTraitChallenge
                         if($this->challenge_canPut($game, $preuser, $eventdata)) {
                             // チャレンジ成功。preuserに4枚追加
                             $game->deal($preuser->id, 4);
-                            $ret->with("message-success", "チャレンジ成功。{{ $preuser->display_name }}に4枚追加しました。");
+                            $ret->with("message-success", "チャレンジ成功。{$preuser->display_name}に4枚追加しました。");
                         } else {
                             // チャレンジ失敗。現userに6枚
                             $game->deal($user->id, 6);

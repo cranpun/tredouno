@@ -12,58 +12,38 @@
 @endsection
 
 @section('main')
-    <?php
+
+<?php
     // 処理に使うデータ
     $user = \App\Models\User::user();
-    $hCard = $game->getHeadCard();
+    $turncolor = "#D0FAFF";
     ?>
-    <style type="text/css">
-        header {
-            display: none;
-        }
-
-        .is-mini {
-            padding: 0px 10px;
-        }
-    </style>
-
-    <a href="{{ route(\App\Models\User::user()->pr('-home')) }}">
-        <b>戻る</b>
-    </a>
-
-    <h1>ID. {{ $game->id }} ({{ $game->created_at }})の部屋</h1>
-
     <div>
-        <h2>プレイヤーと残り枚数</h2>
-        <ul>
-            @foreach ($game->players as $player)
-                <?php $cnt = count($game->getCardsByStatus($player->id)); ?>
-                <li>
-                    {{ $player->display_name }} ({{ $cnt }})
-                    @if($cnt == 1)
-                    【UNO!】
-                    @endif
-                </li>
-            @endforeach
-        </ul>
-    </div>
-    <div>
-        <h2>山札の数</h2>
-        <div>
-            {{ count($game->getCardsByStatus(\App\L\CardState::ID_DECK)) }}
-        </div>
-    </div>
-    <div>
-        <h2>場の札</h2>
-        <div>
-            {{ $hCard }}
-            @if (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD]))
-                （{{ \App\S\CardName::colorName($game->eventdata) }}）
-            @endif
-        </div>
-    </div>
-    <div>
+        <style type="text/css">
+            .wrap-card {
+                padding: 5px;
+                border: 2px solid white;
+                display: inline-block;
+                margin: 5px;
+            }
+
+            .wrap-card.canput {
+                border: 2px dotted orange;
+            }
+
+            .wrap-card.canput:hover {
+                opacity: 0.6;
+            }
+        </style>
         @if ($game->isTurn($user->id))
+            <style type="text/css">
+            body {
+                background: {{ $turncolor }};
+            }
+            .wrap-card {
+                border-color: {{ $turncolor }};
+            }
+            </style>
             <?php
             $cards = $game->getCardsByStatus(\App\Models\User::user()->id);
             ?>
@@ -80,30 +60,32 @@
             --}}
             <div>
                 <h3>あなたの持ち札</h3>
-                <ul>
+                <section style="justify-content: flex-start;">
                     @foreach ($cards as $card)
-                        <li>
-                            {{ $card }}
-                            @if (\App\S\CardName::canPutCard($card, $hCard, $game->cardevent, $game->eventdata))
-                                <form method="POST" enctype="multipart/form-data" class="simple-form"
-                                    style="display: inline-block;"
-                                    action="{{ route(\App\Models\User::user()->pr('-game-putcard'), ['game_id' => $game->id, 'cardname' => $card]) }}">
-                                    @csrf
-                                    <button type="submit" class="is-mini">
-                                        出す
-                                        @if (count($cards) == 2)
-                                            【これを出したらUNO！】
-                                        @elseif(count($cards) == 1)
-                                            【あがり！】
-                                        @endif
-                                    </button>
-                                </form>
-                            @endif
-                        </li>
+                        @if (\App\S\CardName::canPutCard($card, $game->getHeadCard(), $game->cardevent, $game->eventdata))
+                            <form method="POST" enctype="multipart/form-data" class="simple-form wrap-card canput"
+                                style="display: inline-block; min-width: auto;"
+                                action="{{ route(\App\Models\User::user()->pr('-game-putcard'), ['game_id' => $game->id, 'cardname' => $card]) }}">
+                                @csrf
+                                <button type="submit" class="is-mini"
+                                    style="border: none; background: transparent; margin: 0; padding: 0;">
+                                    @include('admin.game._c.card', ['cardname' => $card])
+                                </button>
+                                @if (count($cards) == 2)
+                                    <div style="text-align: center">UNO</div>
+                                @elseif(count($cards) == 1)
+                                    <div style="text-align: center">あがり</div>
+                                @endif
+                            </form>
+                        @else
+                            <span class="wrap-card">
+                                @include('admin.game._c.card', ['cardname' => $card])
+                            </span>
+                        @endif
                     @endforeach
-                </ul>
+                </section>
             </div>
-            <div id="div-event">
+            <div id="div-event" style="padding-left: 7px; padding-top: 15px;">
                 @if ($game->cardevent == \App\L\CardEvent::ID_AFTERPULL)
                     <form method="POST" enctype="multipart/form-data" class="simple-form" style="display: inline-block;"
                         action="{{ route(\App\Models\User::user()->pr('-game-pass'), ['game_id' => $game->id]) }}">
@@ -134,22 +116,14 @@
                         </form>
                     @elseif (in_array($game->cardevent, [\App\L\CardEvent::ID_COLOR_WILD, \App\L\CardEvent::ID_COLOR_WILD4]))
                         <h3>色を選択してください。</h3>
-                        <?php
-                        $btnclrs = [
-                            'r' => 'red',
-                            'g' => 'green',
-                            'b' => 'blue',
-                            'y' => 'yellow',
-                        ];
-                        ?>
                         @foreach (\App\S\CardName::colors() as $clr)
                             <form method="POST" enctype="multipart/form-data" class="simple-form"
-                                style="display: inline-block;"
+                                style="display: inline-block; min-width: auto;"
                                 action="{{ route(\App\Models\User::user()->pr('-game-color'), ['game_id' => $game->id, 'color' => $clr]) }}">
                                 @csrf
                                 <button type="submit" class="is-mini"
-                                    style="border: none; background-color: {{ $btnclrs[$clr] }}; color: #CCCCCC;">
-                                    {{ \App\S\CardName::colorName($clr) }}
+                                    style="border: none; background-color: {{ \App\S\CardName::colorValue($clr) }}; color: #CCCCCC;">
+                                    &nbsp;&nbsp;
                                 </button>
                             </form>
                         @endforeach
@@ -165,11 +139,13 @@
         @else
             <h2>{{ $game->players[0]->display_name }}の番です</h2>
             <h3>あなたの持ち札</h3>
-            <ul>
+            <section style="justify-content: flex-start;">
                 @foreach ($game->getCardsByStatus(\App\Models\User::user()->id) as $card)
-                    <li>{{ $card }}</li>
+                    <span class="wrap-card">
+                        @include('admin.game._c.card', ['cardname' => $card])
+                    </span>
                 @endforeach
-            </ul>
+            </section>
             {{-- 自動リロード --}}
             <script type="text/javascript">
                 window.addEventListener("load", function() {
@@ -180,4 +156,28 @@
             </script>
         @endif
     </div>
+
+    @if ($game->getHeadCard())
+        <div class="pr">
+            <h2>場の札</h2>
+            <div style="display: inline-block;">
+                <span style="padding: 5px; margin: 5px;">
+                    @include('admin.game._c.card', ['cardname' => $game->getHeadCard()])
+                </span>
+                @if (in_array($game->cardevent, [\App\L\CardEvent::ID_WILD]))
+                    <div style="text-align: center">
+                        （<span style="color: {{ \App\S\CardName::colorValue($game->eventdata) }}">■</span>）
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
+    @include('admin.game._c.gamestatus')
+
+    <hr />
+    <a href="{{ route(\App\Models\User::user()->pr('-home')) }}">
+        <b>部屋一覧に戻る</b>
+    </a>
+
 @endsection

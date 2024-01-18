@@ -34,6 +34,24 @@ class CardName
         }
     }
 
+    public static function colorValue($color): string
+    {
+        switch ($color) {
+            case "r":
+                return "#FF0000";
+            case "g":
+                return "#00FF00";
+            case "b":
+                return "#0000FF";
+            case "y":
+                return "#FFD700";
+            case "a":
+                return "rgb(0, 0, 0)";
+            default:
+                return "rgb(255, 255, 255)";
+        }
+    }
+
     public function __construct(string $cardname)
     {
         $params = explode("_", $cardname);
@@ -100,6 +118,18 @@ class CardName
         return $ret;
     }
 
+    public static function kindLabel($kind): string
+    {
+        if (self::isNum($kind)) {
+            return number_format(str_replace("num", "", $kind));
+        } else if ($kind == "wild4") {
+            return "W4";
+        } else {
+            // これ以外は文字カードなので先頭の大文字
+            return strtoupper(substr($kind, 0, 1));
+        }
+    }
+
     public static function cardNamesOnlyNum(): array
     {
         $cards = self::cardNames();
@@ -120,7 +150,7 @@ class CardName
         if (in_array($event, [\App\L\CardEvent::ID_AFTERPULL]) && $data) {
             // AFTERPULLの場合、evetndataに退避したデータがあるかもしれないのでそれを確認
             $oData = json_decode($data);
-            if($obj1->color == $oData->eventdata) {
+            if ($obj1->color == $oData->eventdata) {
                 return true;
             }
         }

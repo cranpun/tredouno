@@ -72,7 +72,11 @@ class Game extends Model
     public function getHeadCard()
     {
         $cards = $this->getCardsByStatus(\App\L\CardState::ID_HEAD);
-        return $cards[0];
+        if (count($cards) > 0) {
+            return $cards[0];
+        } else {
+            return null;
+        }
     }
 
     public function loadPlayers()
@@ -95,15 +99,15 @@ class Game extends Model
     {
         $deck = $this->getCardsByStatus(\App\L\CardState::ID_DECK);
         $place = $this->getCardsByStatus(\App\L\CardState::ID_PLACE);
-        if(count($deck) + count($place) <= 0) {
+        if (count($deck) + count($place) <= 0) {
             return;
-        } else if(count($deck) >= $count) {
+        } else if (count($deck) >= $count) {
             // 山の枚数が引く数より多ければ普通に全部引く
             $cards = \App\L\CardState::dealCard($deck, $count);
         } else {
             // 足りない場合はまず山札を全部引いて、残りは捨て札を山札に残してから改めて引く
             // // 捨て札を山札に戻す
-            foreach($place as $p) {
+            foreach ($place as $p) {
                 $this->{$p} = \App\L\CardState::ID_DECK;
             }
 
@@ -112,7 +116,7 @@ class Game extends Model
         }
 
         // 配られたカードを指定したユーザの手札に
-        foreach($cards as $c) {
+        foreach ($cards as $c) {
             $this->{$c} = $user_id;
         }
 
@@ -130,7 +134,7 @@ class Game extends Model
         $last = array_shift($odr);
         $odr[] = $last; // last == 今のuser_id
         $this->order = join(",", $odr);
-}
+    }
 
     public function addOrder($user_id)
     {

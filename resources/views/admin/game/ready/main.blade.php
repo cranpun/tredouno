@@ -12,34 +12,17 @@
 @endsection
 
 @section('main')
-    <style type="text/css">
-        header {
-            display: none;
-        }
-    </style>
+    @include('admin.game._c.gamestatus')
 
-    <a href="{{ route(\App\Models\User::user()->pr('-home')) }}">
-        <b>戻る</b>
-    </a>
-
-    <h1>ID. {{ $game->id }} ({{ $game->created_at }})の部屋</h1>
     @if ($game->cardevent == \App\L\CardEvent::ID_END)
         @foreach ($game->players as $player)
             @if (count($game->getCardsByStatus($player->id)) <= 0)
-                <div>
+                <div class="pr">
                     <h2>ゲーム終了：勝者 {{ $player->display_name }} </h2>
                 </div>
             @endif
         @endforeach
     @endif
-    <div>
-        <h2>プレイヤー</h2>
-        <ul>
-            @foreach ($game->players as $player)
-                <li>{{ $player->display_name }} ({{ count($game->getCardsByStatus($player->id)) }})</li>
-            @endforeach
-        </ul>
-    </div>
 
     @if (count(explode(',', $game->order)) > 1)
         <div>
@@ -59,4 +42,8 @@
         });
     </script>
 
+    <hr />
+    <a href="{{ route(\App\Models\User::user()->pr('-home')) }}">
+        <b>部屋一覧に戻る</b>
+    </a>
 @endsection
